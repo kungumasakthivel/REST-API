@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 public class BookService implements BookRepository {
     private HashMap<Integer, Book> hmap = new HashMap<>();
 
+    int uniqueId = 3;
+
     public BookService() {
         Book b1 = new Book(1, "harry potter", "harry_potter.jpg");
         Book b2 = new Book(2, "Rise", "rise.jpeg");
@@ -32,6 +34,40 @@ public class BookService implements BookRepository {
         }
         return book;
 
+    }
+
+    @Override
+    public Book addBook(Book book) {
+        book.setId(uniqueId);
+        hmap.put(book.getId(), book);
+        uniqueId++;
+        return book;
+    }
+
+    @Override
+    public Book updateBook(int bookId, Book book) {
+        Book existingBook = hmap.get(bookId);
+        if (existingBook == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        if (book.getName() != null) {
+            existingBook.setName(book.getName());
+        }
+        if (book.getImageUrl() != null) {
+            existingBook.setImageUrl(book.getImageUrl());
+        }
+        return existingBook;
+    }
+
+    @Override
+    public void deleteBook(int bookId) {
+        Book existingBook = hmap.get(bookId);
+        if(existingBook == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        } else {
+            hmap.remove(bookId);
+            throw new ResponseStatusException(HttpStatus.NO_CONTENT);
+        }
     }
 
 }
